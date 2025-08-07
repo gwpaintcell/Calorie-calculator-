@@ -27,6 +27,13 @@
       color: #2b7a4b;
     }
 
+    p.description {
+      font-size: 16px;
+      margin-bottom: 25px;
+      line-height: 1.5;
+      color: #555;
+    }
+
     label {
       display: block;
       margin: 10px 0 5px;
@@ -40,6 +47,7 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
+      box-sizing: border-box;
     }
 
     button {
@@ -63,6 +71,7 @@
       background-color: #e8f5e9;
       border-left: 5px solid #2b7a4b;
       border-radius: 6px;
+      white-space: pre-wrap;
     }
 
     .inline-inputs input {
@@ -74,6 +83,11 @@
 <body>
   <div class="container">
     <h1>Calorie Deficit Calculator</h1>
+    
+    <p class="description">
+      This calculator estimates your Basal Metabolic Rate (BMR) using the Mifflin-St Jeor formula, which calculates the calories your body needs at rest. It then adjusts your BMR by your activity level and daily steps to estimate your Total Daily Energy Expenditure (TDEE). By comparing your current daily calorie intake to your TDEE, it tells you whether you are in a calorie deficit, surplus, or maintenance. Additionally, it estimates your body fat percentage using BMI, age, and gender.
+    </p>
+    
     <form id="calorieForm">
       <label for="gender">Gender:</label>
       <select id="gender" required>
@@ -146,7 +160,7 @@
   </div>
 
   <script>
-    // Toggle height unit
+    // Toggle height unit display
     const heightUnit = document.getElementById('heightUnit');
     const weightUnit = document.getElementById('weightUnit');
 
@@ -162,13 +176,14 @@
       document.getElementById('weightImperial').style.display = useMetric ? 'none' : 'block';
     });
 
+    // Form submission event
     document.getElementById('calorieForm').addEventListener('submit', function(event) {
       event.preventDefault();
 
       const gender = document.getElementById('gender').value;
       const age = parseInt(document.getElementById('age').value);
 
-      // Height conversion
+      // Height conversion to cm
       let heightCm;
       if (heightUnit.value === 'cm') {
         heightCm = parseFloat(document.getElementById('height').value);
@@ -178,7 +193,7 @@
         heightCm = ((feet * 12) + inches) * 2.54;
       }
 
-      // Weight conversion
+      // Weight conversion to kg
       let weightKg;
       if (weightUnit.value === 'kg') {
         weightKg = parseFloat(document.getElementById('weight').value);
@@ -192,7 +207,7 @@
       const steps = parseInt(document.getElementById('steps').value);
       const intake = parseFloat(document.getElementById('calories').value);
 
-      // BMR Calculation (Mifflin-St Jeor)
+      // Calculate BMR using Mifflin-St Jeor formula
       let bmr;
       if (gender === 'male') {
         bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
@@ -200,10 +215,16 @@
         bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
       }
 
+      // Calories burned from steps (approx 0.04 kcal per step)
       const stepCalories = steps * 0.04;
+
+      // Total Daily Energy Expenditure (TDEE)
       const tdee = Math.round(bmr * activityFactor + stepCalories);
+
+      // Difference between intake and TDEE
       const diff = intake - tdee;
 
+      // Determine message based on calorie difference
       let message;
       if (diff < -250) {
         message = `You're in a calorie deficit of ${Math.abs(diff)} calories. Expect weight loss. ✅`;
@@ -213,14 +234,27 @@
         message = `You're around maintenance. Slight deficit/surplus of ${Math.abs(diff)} calories. ⚖️`;
       }
 
+      // Calculate BMI
+      const heightM = heightCm / 100;
+      const bmi = weightKg / (heightM * heightM);
+
+      // Estimate body fat percentage using Deurenberg formula
+      // Body Fat % = 1.20 * BMI + 0.23 * age - 10.8 * sex - 5.4
+      // sex = 1 for male, 0 for female
+      const sexFactor = gender === 'male' ? 1 : 0;
+      const bodyFat = 1.20 * bmi + 0.23 * age - 10.8 * sexFactor - 5.4;
+
+      // Compose result HTML with body fat %
       const resultHTML = `
         <strong>Your Results:</strong><br/>
         BMR: ${Math.round(bmr)} kcal/day<br/>
         Estimated TDEE: ${tdee} kcal/day<br/>
         Calorie Intake: ${intake} kcal/day<br/><br/>
-        <strong>${message}</strong>
+        <strong>${message}</strong><br/><br/>
+        Estimated Body Fat Percentage: ${bodyFat.toFixed(1)}%
       `;
 
+      // Display the results
       const resultDiv = document.getElementById('result');
       resultDiv.innerHTML = resultHTML;
       resultDiv.style.display = 'block';
