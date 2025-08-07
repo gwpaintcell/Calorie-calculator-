@@ -1,82 +1,230 @@
-<script>
-  // Handle unit switching
-  const heightUnit = document.getElementById('heightUnit');
-  const weightUnit = document.getElementById('weightUnit');
-
-  heightUnit.addEventListener('change', () => {
-    const isMetric = heightUnit.value === 'cm';
-    document.getElementById('heightMetric').style.display = isMetric ? 'block' : 'none';
-    document.getElementById('heightImperial').style.display = isMetric ? 'none' : 'block';
-  });
-
-  weightUnit.addEventListener('change', () => {
-    const isMetric = weightUnit.value === 'kg';
-    document.getElementById('weightMetric').style.display = isMetric ? 'block' : 'none';
-    document.getElementById('weightImperial').style.display = isMetric ? 'none' : 'block';
-  });
-
-  // Form logic
-  document.getElementById('calorieForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const gender = document.getElementById('gender').value;
-    const age = parseInt(document.getElementById('age').value);
-
-    // Convert height
-    let heightCm;
-    if (heightUnit.value === 'cm') {
-      heightCm = parseFloat(document.getElementById('height').value);
-    } else {
-      const feet = parseInt(document.getElementById('feet').value);
-      const inches = parseInt(document.getElementById('inches').value);
-      heightCm = (feet * 12 + inches) * 2.54;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calorie Deficit Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5fcf7;
+      color: #333;
+      margin: 0;
+      padding: 20px;
     }
 
-    // Convert weight
-    let weightKg;
-    if (weightUnit.value === 'kg') {
-      weightKg = parseFloat(document.getElementById('weight').value);
-    } else {
-      const stone = parseInt(document.getElementById('stone').value);
-      const pounds = parseInt(document.getElementById('pounds').value);
-      weightKg = (stone * 14 + pounds) * 0.453592;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    const activityFactor = parseFloat(document.getElementById('activity').value);
-    const steps = parseInt(document.getElementById('steps').value);
-    const intake = parseFloat(document.getElementById('calories').value);
-
-    // BMR Calculation
-    let bmr;
-    if (gender === 'male') {
-      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
-    } else {
-      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+    h1 {
+      text-align: center;
+      color: #2b7a4b;
     }
 
-    const stepCalories = steps * 0.04;
-    const tdee = Math.round(bmr * activityFactor + stepCalories);
-    const diff = intake - tdee;
-
-    let message;
-    if (diff < -250) {
-      message = `You're in a calorie deficit of ${Math.abs(diff)} calories. Expect weight loss. ✅`;
-    } else if (diff > 250) {
-      message = `You're in a calorie surplus of ${diff} calories. Expect weight gain. ⚠️`;
-    } else {
-      message = `You're around maintenance. Slight deficit/surplus of ${Math.abs(diff)} calories. ⚖️`;
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
     }
 
-    const resultHTML = `
-      <strong>Your Results:</strong><br/>
-      BMR: ${Math.round(bmr)} kcal/day<br/>
-      Estimated TDEE: ${tdee} kcal/day<br/>
-      Calorie Intake: ${intake} kcal/day<br/><br/>
-      <strong>${message}</strong>
-    `;
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
 
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = resultHTML;
-    resultDiv.style.display = 'block';
-  });
-</script>
+    button {
+      background-color: #2b7a4b;
+      color: white;
+      border: none;
+      padding: 15px;
+      width: 100%;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #256e42;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e8f5e9;
+      border-left: 5px solid #2b7a4b;
+      border-radius: 6px;
+    }
+
+    .inline-inputs input {
+      width: 48%;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calorie Deficit Calculator</h1>
+    <form id="calorieForm">
+      <label for="gender">Gender:</label>
+      <select id="gender" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <label for="age">Age (years):</label>
+      <input type="number" id="age" required min="10" max="100"/>
+
+      <!-- Height -->
+      <label for="heightUnit">Height Unit:</label>
+      <select id="heightUnit">
+        <option value="cm">cm</option>
+        <option value="ft">feet + inches</option>
+      </select>
+
+      <div id="heightMetric">
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" min="100" max="250" />
+      </div>
+
+      <div id="heightImperial" style="display:none;">
+        <label>Height:</label>
+        <div class="inline-inputs">
+          <input type="number" id="feet" placeholder="feet" min="3" max="8"/>
+          <input type="number" id="inches" placeholder="inches" min="0" max="11"/>
+        </div>
+      </div>
+
+      <!-- Weight -->
+      <label for="weightUnit">Weight Unit:</label>
+      <select id="weightUnit">
+        <option value="kg">kg</option>
+        <option value="st">stones + pounds</option>
+      </select>
+
+      <div id="weightMetric">
+        <label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" min="30" max="300"/>
+      </div>
+
+      <div id="weightImperial" style="display:none;">
+        <label>Weight:</label>
+        <div class="inline-inputs">
+          <input type="number" id="stone" placeholder="stones" min="4" max="40"/>
+          <input type="number" id="pounds" placeholder="pounds" min="0" max="13"/>
+        </div>
+      </div>
+
+      <label for="activity">Activity Level:</label>
+      <select id="activity" required>
+        <option value="1.2">Sedentary (little or no exercise)</option>
+        <option value="1.375">Lightly active (light exercise 1–3 days/week)</option>
+        <option value="1.55">Moderately active (moderate exercise 3–5 days/week)</option>
+        <option value="1.725">Very active (hard exercise 6–7 days/week)</option>
+        <option value="1.9">Extra active (very hard exercise or physical job)</option>
+      </select>
+
+      <label for="steps">Average Daily Steps:</label>
+      <input type="number" id="steps" value="0" min="0" />
+
+      <label for="calories">Current Daily Calorie Intake:</label>
+      <input type="number" id="calories" required min="800" />
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    <div id="result" class="result" style="display: none;"></div>
+  </div>
+
+  <script>
+    // Toggle height unit
+    const heightUnit = document.getElementById('heightUnit');
+    const weightUnit = document.getElementById('weightUnit');
+
+    heightUnit.addEventListener('change', () => {
+      const useMetric = heightUnit.value === 'cm';
+      document.getElementById('heightMetric').style.display = useMetric ? 'block' : 'none';
+      document.getElementById('heightImperial').style.display = useMetric ? 'none' : 'block';
+    });
+
+    weightUnit.addEventListener('change', () => {
+      const useMetric = weightUnit.value === 'kg';
+      document.getElementById('weightMetric').style.display = useMetric ? 'block' : 'none';
+      document.getElementById('weightImperial').style.display = useMetric ? 'none' : 'block';
+    });
+
+    document.getElementById('calorieForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const gender = document.getElementById('gender').value;
+      const age = parseInt(document.getElementById('age').value);
+
+      // Height conversion
+      let heightCm;
+      if (heightUnit.value === 'cm') {
+        heightCm = parseFloat(document.getElementById('height').value);
+      } else {
+        const feet = parseFloat(document.getElementById('feet').value) || 0;
+        const inches = parseFloat(document.getElementById('inches').value) || 0;
+        heightCm = ((feet * 12) + inches) * 2.54;
+      }
+
+      // Weight conversion
+      let weightKg;
+      if (weightUnit.value === 'kg') {
+        weightKg = parseFloat(document.getElementById('weight').value);
+      } else {
+        const stone = parseFloat(document.getElementById('stone').value) || 0;
+        const pounds = parseFloat(document.getElementById('pounds').value) || 0;
+        weightKg = ((stone * 14) + pounds) * 0.453592;
+      }
+
+      const activityFactor = parseFloat(document.getElementById('activity').value);
+      const steps = parseInt(document.getElementById('steps').value);
+      const intake = parseFloat(document.getElementById('calories').value);
+
+      // BMR Calculation (Mifflin-St Jeor)
+      let bmr;
+      if (gender === 'male') {
+        bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+      } else {
+        bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+      }
+
+      const stepCalories = steps * 0.04;
+      const tdee = Math.round(bmr * activityFactor + stepCalories);
+      const diff = intake - tdee;
+
+      let message;
+      if (diff < -250) {
+        message = `You're in a calorie deficit of ${Math.abs(diff)} calories. Expect weight loss. ✅`;
+      } else if (diff > 250) {
+        message = `You're in a calorie surplus of ${diff} calories. Expect weight gain. ⚠️`;
+      } else {
+        message = `You're around maintenance. Slight deficit/surplus of ${Math.abs(diff)} calories. ⚖️`;
+      }
+
+      const resultHTML = `
+        <strong>Your Results:</strong><br/>
+        BMR: ${Math.round(bmr)} kcal/day<br/>
+        Estimated TDEE: ${tdee} kcal/day<br/>
+        Calorie Intake: ${intake} kcal/day<br/><br/>
+        <strong>${message}</strong>
+      `;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = resultHTML;
+      resultDiv.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
