@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TDEE Calculator (Mifflin-St Jeor Formula)</title>
   <style>
     :root {
@@ -96,7 +96,6 @@
   </style>
 </head>
 <body>
-
   <div class="container">
     <h1>TDEE Calculator</h1>
     <p class="description">
@@ -111,7 +110,7 @@
       <label for="unit">Units:</label>
       <select id="unit">
         <option value="metric">Metric (kg, cm)</option>
-        <option value="imperial">Imperial (lbs, feet/inches)</option>
+        <option value="imperial">Imperial (lbs or st/lbs, feet/inches)</option>
       </select>
 
       <label for="age">Age (years):</label>
@@ -138,18 +137,20 @@
         <label for="heightInches">Height: Inches</label>
         <input type="number" id="heightInches">
 
-        <label for="weightImperial">Weight (lbs):</label>
-        <input type="number" id="weightImperial">
+        <label for="weightStones">Weight: Stones</label>
+        <input type="number" id="weightStones">
+        <label for="weightPounds">Weight: Pounds</label>
+        <input type="number" id="weightPounds">
       </div>
 
-      <label for="activity">Activity Level:</label>
+      <label for="activity">Activity Level (with step estimate):</label>
       <select id="activity" required>
         <option value="">Select activity level</option>
-        <option value="1.2">Sedentary (little or no exercise)</option>
-        <option value="1.375">Lightly active (light exercise 1–3 days/week)</option>
-        <option value="1.55">Moderately active (moderate exercise or walking most days)</option>
-        <option value="1.725">Very active (hard exercise 6–7 days/week)</option>
-        <option value="1.9">Extra active (physical job or intense training)</option>
+        <option value="1.2">Sedentary (little/no exercise) – ~3,000–4,000 steps/day</option>
+        <option value="1.375">Lightly active (1–3 days/week) – ~5,000–7,000 steps/day</option>
+        <option value="1.55">Moderately active (3–5 days/week) – ~8,000–11,000 steps/day</option>
+        <option value="1.725">Very active (6–7 days/week) – ~12,000–15,000 steps/day</option>
+        <option value="1.9">Extra active (physical job/heavy training) – 15,000+ steps/day</option>
       </select>
 
       <button type="submit">Calculate TDEE</button>
@@ -193,8 +194,12 @@
       } else {
         const feet = parseFloat(document.getElementById('heightFeet').value);
         const inches = parseFloat(document.getElementById('heightInches').value);
-        height = (feet * 12 + inches) * 2.54; // convert to cm
-        weight = parseFloat(document.getElementById('weightImperial').value) * 0.453592; // convert to kg
+        height = (feet * 12 + inches) * 2.54;
+
+        const stones = parseFloat(document.getElementById('weightStones').value) || 0;
+        const pounds = parseFloat(document.getElementById('weightPounds').value) || 0;
+        const totalPounds = (stones * 14) + pounds;
+        weight = totalPounds * 0.453592;
       }
 
       if (!age || !gender || !height || !weight || !activity) {
@@ -213,6 +218,5 @@
       document.getElementById('result').textContent = `Your estimated TDEE is: ${tdee} kcal/day`;
     });
   </script>
-
 </body>
 </html>
