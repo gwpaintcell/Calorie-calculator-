@@ -1,209 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
   <title>TDEE Calculator (Mifflin-St Jeor Formula)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root {
-      --primary: #007BFF;
-      --background: #f4f4f4;
-      --text: #333;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--background);
-      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
       padding: 20px;
-      color: var(--text);
-    }
-
-    .container {
-      max-width: 600px;
-      background: #fff;
-      padding: 25px;
+      max-width: 700px;
       margin: auto;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-
     h1 {
+      color: #333;
       text-align: center;
-      color: var(--primary);
     }
-
     p.description {
-      font-size: 15px;
-      line-height: 1.6;
+      font-size: 16px;
+      color: #444;
       margin-bottom: 20px;
     }
-
     label {
       display: block;
       margin: 10px 0 5px;
-      font-weight: bold;
     }
-
     input, select, button {
       width: 100%;
       padding: 10px;
-      font-size: 1rem;
       margin-bottom: 15px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 4px;
+      font-size: 16px;
     }
-
     button {
-      background-color: var(--primary);
+      background-color: #007BFF;
       color: white;
-      border: none;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-
     #result {
       font-size: 18px;
       font-weight: bold;
+      color: #222;
       margin-top: 20px;
       text-align: center;
     }
-
     .footer {
       font-size: 14px;
-      color: #777;
-      text-align: center;
+      color: #666;
       margin-top: 30px;
+      text-align: center;
     }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-      }
-
-      h1 {
-        font-size: 1.5em;
-      }
+    .unit-toggle {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .unit-toggle label {
+      flex: 1;
+      text-align: center;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .steps-info {
+      font-size: 14px;
+      color: #555;
+      margin-top: -10px;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>TDEE Calculator</h1>
-    <p class="description">
-      This calculator uses the <strong>Mifflin-St Jeor formula</strong> to estimate your Total Daily Energy Expenditure (TDEE) – the number of calories you burn daily based on your body, age, and activity level.
-      <br><br>
-      This is just a guide — no calculation is 100% accurate. If you're aiming to lose weight, a calorie deficit is key. But that doesn't mean giving up the meals you love. It's about balance and moderation.
-      <br><br>
-      <strong>You've already taken the first step — now keep going. You've got this!</strong>
-    </p>
 
-    <form id="tdeeForm">
-      <label for="unit">Units:</label>
-      <select id="unit">
-        <option value="metric">Metric (kg, cm)</option>
-        <option value="imperial">Imperial (lbs or st/lbs, feet/inches)</option>
-      </select>
+  <h1>TDEE Calculator</h1>
+  <p class="description">
+    This calculator uses the <strong>Mifflin-St Jeor formula</strong> to estimate your Total Daily Energy Expenditure (TDEE) — 
+    the number of calories your body burns each day based on your weight, height, age, gender, and activity level.
+    <br><br>
+    Please note: This is only a guide. No one calculation is 100% accurate. 
+    To lose weight, a calorie deficit is essential — but that doesn’t mean cutting out your favourite foods. 
+    It’s all about balance and moderation.
+    <br><br>
+    <strong>You’ve already taken the first step. Keep going — you’ve got this!</strong>
+  </p>
 
-      <label for="age">Age (years):</label>
-      <input type="number" id="age" required>
+  <form id="tdeeForm">
 
-      <label for="gender">Gender:</label>
-      <select id="gender" required>
-        <option value="">Select gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
+    <label for="unitSystem">Choose Unit System:</label>
+    <select id="unitSystem" onchange="toggleUnits()">
+      <option value="metric">Metric (kg, cm)</option>
+      <option value="imperial">Imperial (ft/in, st/lb)</option>
+    </select>
 
-      <div id="metricInputs">
-        <label for="heightMetric">Height (cm):</label>
-        <input type="number" id="heightMetric">
+    <label for="age">Age (years):</label>
+    <input type="number" id="age" required>
 
-        <label for="weightMetric">Weight (kg):</label>
-        <input type="number" id="weightMetric">
-      </div>
+    <label for="gender">Gender:</label>
+    <select id="gender" required>
+      <option value="">Select gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
 
-      <div id="imperialInputs" style="display: none;">
-        <label for="heightFeet">Height: Feet</label>
-        <input type="number" id="heightFeet">
-        <label for="heightInches">Height: Inches</label>
-        <input type="number" id="heightInches">
-
-        <label for="weightStones">Weight: Stones</label>
-        <input type="number" id="weightStones">
-        <label for="weightPounds">Weight: Pounds</label>
-        <input type="number" id="weightPounds">
-      </div>
-
-      <label for="activity">Activity Level (with step estimate):</label>
-      <select id="activity" required>
-        <option value="">Select activity level</option>
-        <option value="1.2">Sedentary (little/no exercise) – ~3,000–4,000 steps/day</option>
-        <option value="1.375">Lightly active (1–3 days/week) – ~5,000–7,000 steps/day</option>
-        <option value="1.55">Moderately active (3–5 days/week) – ~8,000–11,000 steps/day</option>
-        <option value="1.725">Very active (6–7 days/week) – ~12,000–15,000 steps/day</option>
-        <option value="1.9">Extra active (physical job/heavy training) – 15,000+ steps/day</option>
-      </select>
-
-      <button type="submit">Calculate TDEE</button>
-    </form>
-
-    <div id="result"></div>
-
-    <div class="footer">
-      Built for your journey to better health 💪
+    <div id="metricHeight">
+      <label for="height">Height (cm):</label>
+      <input type="number" id="height" step="0.1">
     </div>
+
+    <div id="imperialHeight" class="hidden">
+      <label>Height:</label>
+      <input type="number" id="feet" placeholder="Feet"> 
+      <input type="number" id="inches" placeholder="Inches">
+    </div>
+
+    <div id="metricWeight">
+      <label for="weight">Weight (kg):</label>
+      <input type="number" id="weight" step="0.1">
+    </div>
+
+    <div id="imperialWeight" class="hidden">
+      <label>Weight:</label>
+      <input type="number" id="stone" placeholder="Stone">
+      <input type="number" id="pounds" placeholder="Pounds">
+    </div>
+
+    <label for="activity">Activity Level:</label>
+    <select id="activity" required>
+      <option value="">Select activity level</option>
+      <option value="1.2">Sedentary (little or no exercise) — ~3,000–5,000 steps/day</option>
+      <option value="1.375">Lightly active (light exercise 1–3 days/week) — ~5,000–7,500 steps/day</option>
+      <option value="1.55">Moderately active (moderate exercise or walking most days) — ~7,500–12,000 steps/day</option>
+      <option value="1.725">Very active (hard exercise 6–7 days/week) — ~12,000–15,000 steps/day</option>
+      <option value="1.9">Extra active (physical job or intense training) — 15,000+ steps/day</option>
+    </select>
+
+    <label for="intake">Calories You Eat Daily (optional):</label>
+    <input type="number" id="intake" placeholder="e.g. 2500">
+
+    <button type="submit">Calculate TDEE</button>
+  </form>
+
+  <div id="result"></div>
+
+  <div class="footer">
+    Made with 💪 for your journey.
   </div>
 
   <script>
-    const unitSelect = document.getElementById('unit');
-    const metricInputs = document.getElementById('metricInputs');
-    const imperialInputs = document.getElementById('imperialInputs');
+    function toggleUnits() {
+      const system = document.getElementById('unitSystem').value;
+      document.getElementById('metricHeight').classList.toggle('hidden', system !== 'metric');
+      document.getElementById('metricWeight').classList.toggle('hidden', system !== 'metric');
+      document.getElementById('imperialHeight').classList.toggle('hidden', system !== 'imperial');
+      document.getElementById('imperialWeight').classList.toggle('hidden', system !== 'imperial');
+    }
 
-    unitSelect.addEventListener('change', function () {
-      if (this.value === 'metric') {
-        metricInputs.style.display = 'block';
-        imperialInputs.style.display = 'none';
-      } else {
-        metricInputs.style.display = 'none';
-        imperialInputs.style.display = 'block';
-      }
-    });
-
-    document.getElementById('tdeeForm').addEventListener('submit', function (event) {
+    document.getElementById('tdeeForm').addEventListener('submit', function(event) {
       event.preventDefault();
 
       const age = parseInt(document.getElementById('age').value);
       const gender = document.getElementById('gender').value;
       const activity = parseFloat(document.getElementById('activity').value);
-      const unit = unitSelect.value;
+      const intake = parseInt(document.getElementById('intake').value) || null;
+      const unitSystem = document.getElementById('unitSystem').value;
 
       let height, weight;
 
-      if (unit === 'metric') {
-        height = parseFloat(document.getElementById('heightMetric').value);
-        weight = parseFloat(document.getElementById('weightMetric').value);
+      if (unitSystem === 'metric') {
+        height = parseFloat(document.getElementById('height').value);
+        weight = parseFloat(document.getElementById('weight').value);
       } else {
-        const feet = parseFloat(document.getElementById('heightFeet').value);
-        const inches = parseFloat(document.getElementById('heightInches').value);
-        height = (feet * 12 + inches) * 2.54;
-
-        const stones = parseFloat(document.getElementById('weightStones').value) || 0;
-        const pounds = parseFloat(document.getElementById('weightPounds').value) || 0;
-        const totalPounds = (stones * 14) + pounds;
-        weight = totalPounds * 0.453592;
+        const feet = parseInt(document.getElementById('feet').value) || 0;
+        const inches = parseInt(document.getElementById('inches').value) || 0;
+        const stone = parseInt(document.getElementById('stone').value) || 0;
+        const pounds = parseInt(document.getElementById('pounds').value) || 0;
+        height = ((feet * 12) + inches) * 2.54; // to cm
+        weight = (stone * 14 + pounds) * 0.453592; // to kg
       }
 
-      if (!age || !gender || !height || !weight || !activity) {
-        document.getElementById('result').textContent = "Please fill in all fields correctly.";
+      if (!age || !height || !weight || !gender || !activity) {
+        document.getElementById('result').textContent = "Please fill in all required fields.";
         return;
       }
 
@@ -215,8 +196,23 @@
       }
 
       const tdee = Math.round(bmr * activity);
-      document.getElementById('result').textContent = `Your estimated TDEE is: ${tdee} kcal/day`;
+
+      let output = `Your estimated TDEE is: <strong>${tdee} kcal/day</strong><br>`;
+
+      if (intake) {
+        const diff = intake - tdee;
+        if (Math.abs(diff) <= 100) {
+          output += `⚖️ You are eating around maintenance calories.`;
+        } else if (diff < 0) {
+          output += `🔻 You are in a <strong>calorie deficit</strong> of <strong>${Math.abs(diff)} kcal/day</strong>.`;
+        } else {
+          output += `🔺 You are in a <strong>calorie surplus</strong> of <strong>${diff} kcal/day</strong>.`;
+        }
+      }
+
+      document.getElementById('result').innerHTML = output;
     });
   </script>
+
 </body>
 </html>
