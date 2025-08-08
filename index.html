@@ -1,280 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calorie Deficit Calculator</title>
+  <meta charset="UTF-8">
+  <title>TDEE Calculator (Mifflin-St Jeor Formula)</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5fcf7;
-      color: #333;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
       padding: 20px;
-    }
-
-    .container {
       max-width: 600px;
       margin: auto;
-      padding: 30px;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
     h1 {
+      color: #333;
       text-align: center;
-      color: #2b7a4b;
     }
-
     p.description {
       font-size: 16px;
-      margin-bottom: 25px;
-      line-height: 1.5;
-      color: #555;
+      color: #444;
+      margin-bottom: 20px;
     }
-
     label {
       display: block;
       margin: 10px 0 5px;
-      font-weight: bold;
     }
-
-    input, select {
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: 16px;
-      box-sizing: border-box;
     }
-
-    /* For checkbox label */
-    label > input[type="checkbox"] {
-      width: auto;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
     button {
-      background-color: #2b7a4b;
+      background-color: #007BFF;
       color: white;
-      border: none;
-      padding: 15px;
-      width: 100%;
-      font-size: 18px;
-      border-radius: 6px;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #256e42;
+      background-color: #0056b3;
     }
-
-    .result {
+    #result {
+      font-size: 18px;
+      font-weight: bold;
+      color: #222;
       margin-top: 20px;
-      padding: 15px;
-      background-color: #e8f5e9;
-      border-left: 5px solid #2b7a4b;
-      border-radius: 6px;
-      white-space: pre-wrap;
+      text-align: center;
     }
-
-    .inline-inputs input {
-      width: 48%;
-      display: inline-block;
+    .footer {
+      font-size: 14px;
+      color: #666;
+      margin-top: 30px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Calorie Deficit Calculator</h1>
-    
-    <p class="description">
-      This calculator estimates your Basal Metabolic Rate (BMR) using the Mifflin-St Jeor formula, which calculates the calories your body needs at rest. It then adjusts your BMR by your activity level and daily steps to estimate your Total Daily Energy Expenditure (TDEE). By comparing your current daily calorie intake to your TDEE, it tells you whether you are in a calorie deficit, surplus, or maintenance. Additionally, it estimates your body fat percentage using BMI, age, and gender.
-    </p>
-    
-    <form id="calorieForm">
-      <label for="gender">Gender:</label>
-      <select id="gender" required>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
 
-      <label for="age">Age (years):</label>
-      <input type="number" id="age" required min="10" max="100"/>
+  <h1>TDEE Calculator</h1>
+  <p class="description">
+    This calculator uses the <strong>Mifflin-St Jeor formula</strong> to estimate your Total Daily Energy Expenditure (TDEE). 
+    TDEE is the number of calories your body burns per day based on your height, weight, age, gender, and general activity level.
+    Please note: This is only a guide — no single calculation can be 100% accurate for everyone. 
+    <br><br>
+    If your goal is weight loss, remember: a calorie deficit is essential, but that doesn’t mean you have to give up the meals you love. 
+    It’s all about moderation, sustainability, and balance.
+    <br><br>
+    <strong>You’ve already taken the first step — keep going, you've got this!</strong>
+  </p>
 
-      <!-- Height -->
-      <label for="heightUnit">Height Unit:</label>
-      <select id="heightUnit">
-        <option value="cm">cm</option>
-        <option value="ft">feet + inches</option>
-      </select>
+  <form id="tdeeForm">
+    <label for="age">Age (years):</label>
+    <input type="number" id="age" required>
 
-      <div id="heightMetric">
-        <label for="height">Height (cm):</label>
-        <input type="number" id="height" min="100" max="250" />
-      </div>
+    <label for="gender">Gender:</label>
+    <select id="gender" required>
+      <option value="">Select gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
 
-      <div id="heightImperial" style="display:none;">
-        <label>Height:</label>
-        <div class="inline-inputs">
-          <input type="number" id="feet" placeholder="feet" min="3" max="8"/>
-          <input type="number" id="inches" placeholder="inches" min="0" max="11"/>
-        </div>
-      </div>
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" required>
 
-      <!-- Weight -->
-      <label for="weightUnit">Weight Unit:</label>
-      <select id="weightUnit">
-        <option value="kg">kg</option>
-        <option value="st">stones + pounds</option>
-      </select>
+    <label for="weight">Weight (kg):</label>
+    <input type="number" id="weight" required>
 
-      <div id="weightMetric">
-        <label for="weight">Weight (kg):</label>
-        <input type="number" id="weight" min="30" max="300"/>
-      </div>
+    <label for="activity">Activity Level:</label>
+    <select id="activity" required>
+      <option value="">Select activity level</option>
+      <option value="1.2">Sedentary (little or no exercise)</option>
+      <option value="1.375">Lightly active (light exercise 1–3 days/week)</option>
+      <option value="1.55">Moderately active (moderate exercise or walking most days)</option>
+      <option value="1.725">Very active (hard exercise 6–7 days/week)</option>
+      <option value="1.9">Extra active (physical job or intense training)</option>
+    </select>
 
-      <div id="weightImperial" style="display:none;">
-        <label>Weight:</label>
-        <div class="inline-inputs">
-          <input type="number" id="stone" placeholder="stones" min="4" max="40"/>
-          <input type="number" id="pounds" placeholder="pounds" min="0" max="13"/>
-        </div>
-      </div>
+    <button type="submit">Calculate TDEE</button>
+  </form>
 
-      <label for="activity">Activity Level:</label>
-      <select id="activity" required>
-        <option value="1.2">Sedentary (little or no exercise)</option>
-        <option value="1.375">Lightly active (light exercise 1–3 days/week)</option>
-        <option value="1.55">Moderately active (moderate exercise 3–5 days/week)</option>
-        <option value="1.725">Very active (hard exercise 6–7 days/week)</option>
-        <option value="1.9">Extra active (very hard exercise or physical job)</option>
-      </select>
+  <div id="result"></div>
 
-      <label>
-        <input type="checkbox" id="ignoreActivity" />
-        Ignore activity level (use BMR only + steps)
-      </label>
-
-      <label for="steps">Average Daily Steps:</label>
-      <input type="number" id="steps" value="0" min="0" />
-
-      <label for="calories">Current Daily Calorie Intake:</label>
-      <input type="number" id="calories" required min="800" />
-
-      <button type="submit">Calculate</button>
-    </form>
-
-    <div id="result" class="result" style="display: none;"></div>
+  <div class="footer">
+    Made with 💪 for your journey.
   </div>
 
   <script>
-    // Toggle height unit display
-    const heightUnit = document.getElementById('heightUnit');
-    const weightUnit = document.getElementById('weightUnit');
-
-    heightUnit.addEventListener('change', () => {
-      const useMetric = heightUnit.value === 'cm';
-      document.getElementById('heightMetric').style.display = useMetric ? 'block' : 'none';
-      document.getElementById('heightImperial').style.display = useMetric ? 'none' : 'block';
-    });
-
-    weightUnit.addEventListener('change', () => {
-      const useMetric = weightUnit.value === 'kg';
-      document.getElementById('weightMetric').style.display = useMetric ? 'block' : 'none';
-      document.getElementById('weightImperial').style.display = useMetric ? 'none' : 'block';
-    });
-
-    // Form submission event
-    document.getElementById('calorieForm').addEventListener('submit', function(event) {
+    document.getElementById('tdeeForm').addEventListener('submit', function(event) {
       event.preventDefault();
 
-      const gender = document.getElementById('gender').value;
       const age = parseInt(document.getElementById('age').value);
+      const gender = document.getElementById('gender').value;
+      const height = parseFloat(document.getElementById('height').value);
+      const weight = parseFloat(document.getElementById('weight').value);
+      const activity = parseFloat(document.getElementById('activity').value);
 
-      // Height conversion to cm
-      let heightCm;
-      if (heightUnit.value === 'cm') {
-        heightCm = parseFloat(document.getElementById('height').value);
-      } else {
-        const feet = parseFloat(document.getElementById('feet').value) || 0;
-        const inches = parseFloat(document.getElementById('inches').value) || 0;
-        heightCm = ((feet * 12) + inches) * 2.54;
+      if (!age || !height || !weight || !gender || !activity) {
+        document.getElementById('result').textContent = "Please fill in all fields.";
+        return;
       }
 
-      // Weight conversion to kg
-      let weightKg;
-      if (weightUnit.value === 'kg') {
-        weightKg = parseFloat(document.getElementById('weight').value);
-      } else {
-        const stone = parseFloat(document.getElementById('stone').value) || 0;
-        const pounds = parseFloat(document.getElementById('pounds').value) || 0;
-        weightKg = ((stone * 14) + pounds) * 0.453592;
-      }
-
-      const activityFactor = parseFloat(document.getElementById('activity').value);
-      const steps = parseInt(document.getElementById('steps').value);
-      const intake = parseFloat(document.getElementById('calories').value);
-      const ignoreActivity = document.getElementById('ignoreActivity').checked;
-
-      // Calculate BMR using Mifflin-St Jeor formula
       let bmr;
       if (gender === 'male') {
-        bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5;
       } else {
-        bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161;
       }
 
-      // Calories burned from steps (approx 0.04 kcal per step)
-      const stepCalories = steps * 0.04;
-
-      // Total Daily Energy Expenditure (TDEE)
-      let tdee;
-      if (ignoreActivity) {
-        tdee = Math.round(bmr + stepCalories);
-      } else {
-        tdee = Math.round(bmr * activityFactor + stepCalories);
-      }
-
-      // Difference between intake and TDEE
-      const diff = intake - tdee;
-
-      // Determine message based on calorie difference
-      let message;
-      if (diff < -250) {
-        message = `You're in a calorie deficit of ${Math.abs(diff)} calories. Expect weight loss. ✅`;
-      } else if (diff > 250) {
-        message = `You're in a calorie surplus of ${diff} calories. Expect weight gain. ⚠️`;
-      } else {
-        message = `You're around maintenance. Slight deficit/surplus of ${Math.abs(diff)} calories. ⚖️`;
-      }
-
-      // Calculate BMI
-      const heightM = heightCm / 100;
-      const bmi = weightKg / (heightM * heightM);
-
-      // Body Fat Percentage estimate using BMI, age, gender
-      // Using Deurenberg formula
-      let bodyFat = (1.20 * bmi) + (0.23 * age) - (10.8 * (gender === 'male' ? 1 : 0)) - 5.4;
-      bodyFat = bodyFat.toFixed(1);
-
-      const resultText = `
-BMR (Basal Metabolic Rate): ${Math.round(bmr)} calories/day
-TDEE (Total Daily Energy Expenditure): ${tdee} calories/day
-
-${message}
-
-Body Mass Index (BMI): ${bmi.toFixed(1)}
-Estimated Body Fat Percentage: ${bodyFat}%
-`;
-
-      const resultDiv = document.getElementById('result');
-      resultDiv.style.display = 'block';
-      resultDiv.textContent = resultText;
+      const tdee = Math.round(bmr * activity);
+      document.getElementById('result').textContent = `Your estimated TDEE is: ${tdee} kcal/day`;
     });
   </script>
+
 </body>
 </html>
