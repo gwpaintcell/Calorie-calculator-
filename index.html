@@ -2,121 +2,203 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TDEE Calculator (Mifflin-St Jeor Formula)</title>
   <style>
+    :root {
+      --primary: #007BFF;
+      --background: #f4f4f4;
+      --text: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      margin: 0;
       padding: 20px;
+      color: var(--text);
+    }
+
+    .container {
       max-width: 600px;
+      background: #fff;
+      padding: 25px;
       margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
     h1 {
-      color: #333;
       text-align: center;
+      color: var(--primary);
     }
+
     p.description {
-      font-size: 16px;
-      color: #444;
+      font-size: 15px;
+      line-height: 1.6;
       margin-bottom: 20px;
     }
+
     label {
       display: block;
       margin: 10px 0 5px;
+      font-weight: bold;
     }
+
     input, select, button {
       width: 100%;
       padding: 10px;
+      font-size: 1rem;
       margin-bottom: 15px;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
+      border-radius: 5px;
     }
+
     button {
-      background-color: #007BFF;
+      background-color: var(--primary);
       color: white;
+      border: none;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     #result {
       font-size: 18px;
       font-weight: bold;
-      color: #222;
       margin-top: 20px;
       text-align: center;
     }
+
     .footer {
       font-size: 14px;
-      color: #666;
-      margin-top: 30px;
+      color: #777;
       text-align: center;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>TDEE Calculator</h1>
-  <p class="description">
-    This calculator uses the <strong>Mifflin-St Jeor formula</strong> to estimate your Total Daily Energy Expenditure (TDEE). 
-    TDEE is the number of calories your body burns per day based on your height, weight, age, gender, and general activity level.
-    Please note: This is only a guide — no single calculation can be 100% accurate for everyone. 
-    <br><br>
-    If your goal is weight loss, remember: a calorie deficit is essential, but that doesn’t mean you have to give up the meals you love. 
-    It’s all about moderation, sustainability, and balance.
-    <br><br>
-    <strong>You’ve already taken the first step — keep going, you've got this!</strong>
-  </p>
+  <div class="container">
+    <h1>TDEE Calculator</h1>
+    <p class="description">
+      This calculator uses the <strong>Mifflin-St Jeor formula</strong> to estimate your Total Daily Energy Expenditure (TDEE) – the number of calories you burn daily based on your body, age, and activity level.
+      <br><br>
+      This is just a guide — no calculation is 100% accurate. If you're aiming to lose weight, a calorie deficit is key. But that doesn't mean giving up the meals you love. It's about balance and moderation.
+      <br><br>
+      <strong>You've already taken the first step — now keep going. You've got this!</strong>
+    </p>
 
-  <form id="tdeeForm">
-    <label for="age">Age (years):</label>
-    <input type="number" id="age" required>
+    <form id="tdeeForm">
+      <label for="unit">Units:</label>
+      <select id="unit">
+        <option value="metric">Metric (kg, cm)</option>
+        <option value="imperial">Imperial (lbs, feet/inches)</option>
+      </select>
 
-    <label for="gender">Gender:</label>
-    <select id="gender" required>
-      <option value="">Select gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
+      <label for="age">Age (years):</label>
+      <input type="number" id="age" required>
 
-    <label for="height">Height (cm):</label>
-    <input type="number" id="height" required>
+      <label for="gender">Gender:</label>
+      <select id="gender" required>
+        <option value="">Select gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
 
-    <label for="weight">Weight (kg):</label>
-    <input type="number" id="weight" required>
+      <div id="metricInputs">
+        <label for="heightMetric">Height (cm):</label>
+        <input type="number" id="heightMetric">
 
-    <label for="activity">Activity Level:</label>
-    <select id="activity" required>
-      <option value="">Select activity level</option>
-      <option value="1.2">Sedentary (little or no exercise)</option>
-      <option value="1.375">Lightly active (light exercise 1–3 days/week)</option>
-      <option value="1.55">Moderately active (moderate exercise or walking most days)</option>
-      <option value="1.725">Very active (hard exercise 6–7 days/week)</option>
-      <option value="1.9">Extra active (physical job or intense training)</option>
-    </select>
+        <label for="weightMetric">Weight (kg):</label>
+        <input type="number" id="weightMetric">
+      </div>
 
-    <button type="submit">Calculate TDEE</button>
-  </form>
+      <div id="imperialInputs" style="display: none;">
+        <label for="heightFeet">Height: Feet</label>
+        <input type="number" id="heightFeet">
+        <label for="heightInches">Height: Inches</label>
+        <input type="number" id="heightInches">
 
-  <div id="result"></div>
+        <label for="weightImperial">Weight (lbs):</label>
+        <input type="number" id="weightImperial">
+      </div>
 
-  <div class="footer">
-    Made with 💪 for your journey.
+      <label for="activity">Activity Level:</label>
+      <select id="activity" required>
+        <option value="">Select activity level</option>
+        <option value="1.2">Sedentary (little or no exercise)</option>
+        <option value="1.375">Lightly active (light exercise 1–3 days/week)</option>
+        <option value="1.55">Moderately active (moderate exercise or walking most days)</option>
+        <option value="1.725">Very active (hard exercise 6–7 days/week)</option>
+        <option value="1.9">Extra active (physical job or intense training)</option>
+      </select>
+
+      <button type="submit">Calculate TDEE</button>
+    </form>
+
+    <div id="result"></div>
+
+    <div class="footer">
+      Built for your journey to better health 💪
+    </div>
   </div>
 
   <script>
-    document.getElementById('tdeeForm').addEventListener('submit', function(event) {
+    const unitSelect = document.getElementById('unit');
+    const metricInputs = document.getElementById('metricInputs');
+    const imperialInputs = document.getElementById('imperialInputs');
+
+    unitSelect.addEventListener('change', function () {
+      if (this.value === 'metric') {
+        metricInputs.style.display = 'block';
+        imperialInputs.style.display = 'none';
+      } else {
+        metricInputs.style.display = 'none';
+        imperialInputs.style.display = 'block';
+      }
+    });
+
+    document.getElementById('tdeeForm').addEventListener('submit', function (event) {
       event.preventDefault();
 
       const age = parseInt(document.getElementById('age').value);
       const gender = document.getElementById('gender').value;
-      const height = parseFloat(document.getElementById('height').value);
-      const weight = parseFloat(document.getElementById('weight').value);
       const activity = parseFloat(document.getElementById('activity').value);
+      const unit = unitSelect.value;
 
-      if (!age || !height || !weight || !gender || !activity) {
-        document.getElementById('result').textContent = "Please fill in all fields.";
+      let height, weight;
+
+      if (unit === 'metric') {
+        height = parseFloat(document.getElementById('heightMetric').value);
+        weight = parseFloat(document.getElementById('weightMetric').value);
+      } else {
+        const feet = parseFloat(document.getElementById('heightFeet').value);
+        const inches = parseFloat(document.getElementById('heightInches').value);
+        height = (feet * 12 + inches) * 2.54; // convert to cm
+        weight = parseFloat(document.getElementById('weightImperial').value) * 0.453592; // convert to kg
+      }
+
+      if (!age || !gender || !height || !weight || !activity) {
+        document.getElementById('result').textContent = "Please fill in all fields correctly.";
         return;
       }
 
